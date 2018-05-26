@@ -46,8 +46,6 @@ let spotifySong = function(songTitle) {
   album: ${response.album.name}\n`)
   });
 
-  }
-
 };
 
 let movieThis = function(movieTitle) {
@@ -71,8 +69,6 @@ let movieThis = function(movieTitle) {
       Actors: ${JSON.parse(body).Actors}\n`);
     }
   });
-  }
-
 };
 
 let runCmd = function(theCmd, input) {
@@ -87,9 +83,6 @@ let fromArgv;
 
 switch (theCmd) {
 
-if (process.argv[2]) {
-
-}
 
 case "my-tweets":
   myTweets();
@@ -118,43 +111,25 @@ break;
 case "movie-this":
 
 if (!fromArgv && input) {
-  spotifySong(input);
+  movieTitle(input);
 } else if (!fromArgv || !input) {
-  spotifySong("Mr. Nobody");
+  movieTitle("Mr. Nobody");
 } else if (fromArgv && !process.argv[4]) {
   input = process.argv[3]
-  spotifySong(input);
+  movieTitle(input);
 } else {
-  console.log("please enclose movie title in single quotes, for example:\nnode liri.js spotify-this-song 'war games'");
+  console.log("please enclose movie title in single quotes, for example:\nnode liri.js movie-this 'im a cyborg, but thats ok'");
 };
-
-
-if (process.argv[3] && process.argv[4]) {
-
-  break;
-
-} else {
-
-  let movieTitle = '';
-    if (!process.argv[3]) {
-      movieTitle = 'Mr. Nobody';
-    } else {
-      movieTitle = process.argv[3];
-    }
-
-
-movieThis(filmTitle);
-
 break;
 
 // run commands contained in file "random.txt"
 case "do-what-it-says":
 
 if (!fromArgv) {
+  // if command came from random.txt, you probably don't want to start this over
   console.log("I'm sorry Dave, I'm afraid I can't do that");
   break;
-}
-
+} else {
 fs.readFile("random.txt", "utf8", function(err, data) {
   if (err) {
     return console.log(err);
@@ -167,13 +142,13 @@ console.log(output);
 
   // Loop Through the newly created output array
   for (var i = 0; i < output.length; i++) {
-    output[i].split(",") // split on comma
-    runCmd()
+    let command = output[i].split(",", 2) // split on comma
+    console.log(command);
     // Print each element (item) of the array/
     //console.log(output[i]);
   }
 });
-
+}
 break;
 
 default:
