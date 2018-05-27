@@ -73,94 +73,104 @@ let movieThis = function(movieTitle) {
 
 let runCmd = function(theCmd, input) {
 
-let fromArgv;
+  let fromArgv;
 
-  if (process.argv[2] == "do-what-it-says" && theCmd != "do-what-it-says") {
-    fromArgv = false;
-  } else if (process.argv) {
-    fromArgv = true;
-  }
+    if (process.argv[2] == "do-what-it-says" && theCmd != "do-what-it-says") {
+      fromArgv = false;
+    } else if (process.argv) {
+      fromArgv = true;
+    }
 
-switch (theCmd) {
-
-
-case "my-tweets":
-  myTweets();
-break;
-
-// retrieves song info from spotify and logs to console.
-// if no argument is provided, info for "All That She Wants" is displayed.
-case "spotify-this-song":
-
-if (!fromArgv && input) {
-  spotifySong(input);
-} else if (!fromArgv || !input) {
-  spotifySong("All That She Wants");
-} else if (fromArgv && !process.argv[4]) {
-  input = process.argv[3]
-  spotifySong(input);
-} else {
-    console.log("please enclose song title in single or double quotes, examples:\nnode liri.js spotify-this-song 'the honesty of constant human error'");
-};
-
-break;
+  switch (theCmd) {
 
 
-// retrieves movie info from OMDB
-// if no movie is provided, log info for Mr. Nobody
-case "movie-this":
-
-if (!fromArgv && input) {
-  movieTitle(input);
-} else if (!fromArgv || !input) {
-  movieTitle("Mr. Nobody");
-} else if (fromArgv && !process.argv[4]) {
-  input = process.argv[3]
-  movieTitle(input);
-} else {
-  console.log("please enclose movie title in single quotes, for example:\nnode liri.js movie-this 'im a cyborg, but thats ok'");
-};
-break;
-
-// run commands contained in file "random.txt"
-case "do-what-it-says":
-
-if (!fromArgv) {
-  // if command came from random.txt, you probably don't want to start this over
-  console.log("I'm sorry Dave, I'm afraid I can't do that");
+  case "my-tweets":
+    myTweets();
   break;
-} else {
-fs.readFile("random.txt", "utf8", function(err, data) {
-  if (err) {
-    return console.log(err);
+
+  // retrieves song info from spotify and logs to console.
+  // if no argument is provided, info for "All That She Wants" is displayed.
+  case "spotify-this-song":
+
+  if (!fromArgv && input) {
+    spotifySong(input);
+  } else if (!fromArgv || !input) {
+    spotifySong("All That She Wants");
+  } else if (fromArgv && !process.argv[4]) {
+    input = process.argv[3]
+    spotifySong(input);
+  } else {
+      console.log("please enclose song title in single or double quotes, examples:\nnode liri.js spotify-this-song 'the honesty of constant human error'");
+  };
+
+  break;
+
+
+  // retrieves movie info from OMDB
+  // if no movie is provided, log info for Mr. Nobody
+  case "movie-this":
+
+  if (!fromArgv && input) {
+    movieThis(input);
+  } else if (!fromArgv || !input) {
+    movieThis("Mr. Nobody");
+  } else if (fromArgv && !process.argv[4]) {
+    input = process.argv[3]
+    movieThis(input);
+  } else {
+    console.log("please enclose movie title in single quotes, for example:\nnode liri.js movie-this 'im a cyborg, but thats ok'");
+  };
+  break;
+
+  // run commands contained in file "random.txt"
+  case "do-what-it-says":
+
+  if (!fromArgv) {
+    // if command came from random.txt, you probably don't want to start this over
+    console.log("I'm sorry Dave, I'm afraid I can't do that");
+    break;
+  } else {
+  fs.readFile("random.txt", "utf8", function(err, data) {
+    if (err) {
+      return console.log(err);
+    }
+
+  // split on new line after trimming whitespace (or final newline char)
+  let output = data.trim().split("\n");
+
+    // Loop Through the newly created output array
+    for (var i = 0; i < output.length; i++) {
+      let splitCmdArg = output[i].split(",", 2) // split on comma
+      let command = splitCmdArg[0];
+      let argument = splitCmdArg[1];
+
+      console.log("\trunning command " + command + " from random.txt...");
+
+      if (command == "do-what-it-says") {
+        console.log("I'm sorry Dave, I'm afraid I can't do that");
+      } else if (!argument) {
+        runCmd(command);
+      }
+      else {
+        runCmd(command, argument);
+      }
+    }
+  });
+  }
+  break;
+
+  default:
+  console.log(`sorry, this was command not recognized. please use one of these commands:
+
+    my-tweets\t\t\t\treturn your most recent tweets
+    spotify-this-song '<song title>'\tsearch spotify for song
+    movie-this '<movie-title>'\t\tsearch imdb for movie info
+    do-what-it-says\t\t\tread command's from random.txt
+    `);
+  break;
   }
 
-
-let output = data.trim().split("\n");
-console.log(data);
-console.log(output);
-
-  // Loop Through the newly created output array
-  for (var i = 0; i < output.length; i++) {
-    let command = output[i].split(",", 2) // split on comma
-    console.log(command);
-    // Print each element (item) of the array/
-    //console.log(output[i]);
-  }
-});
-}
-break;
-
-default:
-console.log(`sorry, this was command not recognized. please use one of these commands:
-
-  my-tweets\t\t\t\treturn your most recent tweets
-  spotify-this-song '<song title>'\tsearch spotify for song
-  movie-this '<movie-title>'\t\tsearch imdb for movie info
-  do-what-it-says\t\t\tread command's from random.txt
-  `);
-break;
 }
 
-}
-// console.log(`Command was: ${process.argv[2]}\n`);
+// take input from process.argv
+runCmd(process.argv[2], process.argv[3]);
