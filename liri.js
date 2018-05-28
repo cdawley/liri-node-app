@@ -75,6 +75,7 @@ let runCmd = function(theCmd, input) {
 
   let fromArgv;
 
+
     if (process.argv[2] == "do-what-it-says" && theCmd != "do-what-it-says") {
       fromArgv = false;
     } else if (process.argv) {
@@ -86,6 +87,10 @@ let runCmd = function(theCmd, input) {
 
   case "my-tweets":
     myTweets();
+    fs.appendFile('log.txt', `${theCmd}\n`, function (err) {
+      if (err) throw err;
+      console.log(`\tCommand ${theCmd} saved to log!`);
+    });
   break;
 
   // retrieves song info from spotify and logs to console.
@@ -94,11 +99,19 @@ let runCmd = function(theCmd, input) {
 
   if (!fromArgv && input) {
     spotifySong(input);
-  } else if (!fromArgv || !input) {
+  } else if (!fromArgv || !input || input == "(none)") {
     spotifySong("All That She Wants");
+    fs.appendFile('log.txt', `${theCmd} - ${input}\n`, function (err) {
+      if (err) throw err;
+      console.log(`\tCommand ${theCmd} saved to log!`);
+    });
   } else if (fromArgv && !process.argv[4]) {
     input = process.argv[3]
     spotifySong(input);
+    fs.appendFile('log.txt', `${theCmd} - ${input}\n`, function (err) {
+      if (err) throw err;
+      console.log(`\tCommand ${theCmd} saved to log!`);
+    });
   } else {
       console.log("please enclose song title in single or double quotes, examples:\nnode liri.js spotify-this-song 'the honesty of constant human error'");
   };
@@ -112,11 +125,19 @@ let runCmd = function(theCmd, input) {
 
   if (!fromArgv && input) {
     movieThis(input);
-  } else if (!fromArgv || !input) {
+  } else if (!fromArgv || !input || input == "(none)") {
     movieThis("Mr. Nobody");
+    fs.appendFile('log.txt', `${theCmd} - ${input}\n`, function (err) {
+      if (err) throw err;
+      console.log(`\tCommand ${theCmd} saved to log!`);
+    });
   } else if (fromArgv && !process.argv[4]) {
     input = process.argv[3]
     movieThis(input);
+    fs.appendFile('log.txt', `${theCmd} - ${input}\n`, function (err) {
+      if (err) throw err;
+      console.log(`\tCommand ${theCmd} saved to log!`);
+    });
   } else {
     console.log("please enclose movie title in single quotes, for example:\nnode liri.js movie-this 'im a cyborg, but thats ok'");
   };
@@ -144,17 +165,31 @@ let runCmd = function(theCmd, input) {
       let command = splitCmdArg[0];
       let argument = splitCmdArg[1];
 
-      console.log("\trunning command " + command + " from random.txt...");
+      console.log(`\trunning command from random.txt: ${command} ${argument}...`);
+      fs.appendFile('log.txt', `${theCmd}\n`, function (err) {
+        if (err) throw err;
+        console.log(`\tCommand ${theCmd} saved to log!`);
+      });
+ let checkedArg;
+      if (!argument) {
+        checkedArg = "(none)";
+      } else {
+          checkedArg = argument;
+        }
 
       if (command == "do-what-it-says") {
         console.log("I'm sorry Dave, I'm afraid I can't do that");
-      } else if (!argument) {
-        runCmd(command);
-      }
-      else {
+      } else if (!argument || argument.length == 0) {
+        runCmd(command, "(none)");
+      } else {
         runCmd(command, argument);
+        fs.appendFile('log.txt', `${i}. ${command} - ${checkedArg}\n`, function (err) {
+          if (err) throw err;
+          console.log(`\tCommand from random.txt: ${command} ${argument} saved to log!`);
+  });
       }
     }
+
   });
   }
   break;
@@ -173,4 +208,5 @@ let runCmd = function(theCmd, input) {
 }
 
 // take input from process.argv
+
 runCmd(process.argv[2], process.argv[3]);
